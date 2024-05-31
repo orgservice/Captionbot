@@ -22,7 +22,7 @@ class Config(object):
 
     # keep empty to allow in all channels. Can add multiple channels separated by a comma.
     # Don't forget -100 before the channel ID
-    ALLOWED_CHANNELS = [-100123456789]
+    ALLOWED_CHANNELS = []
 
     # REMOVE or POSTFIX or NIL. Useful for tamilblasters, tamilmv and other webites
     WEBSITE_PREFIX = "POSTFIX"  
