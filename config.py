@@ -15,7 +15,7 @@ class Config(object):
     ADMIN_USERNAME = "adultsupport"  # without "@". 
 
     # a list of strings of words to remove from the existing caption
-    WORDS_TO_REMOVE = ["💥Join:- @ViSHWA_MOViEX", "🍿 𝖩𝗈𝗂𝗇  ➥ 「 @RJMoviessWorld 」"]  
+    WORDS_TO_REMOVE = ["⚡ Join :- [@flimyworld_17]", "💥Join:- @ViSHWA_MOViEX", "🍿 𝖩𝗈𝗂𝗇  ➥ 「 @RJMoviessWorld 」"]  
     # a list of regex pattern strings to remove from the existing caption. 
     # For eg. r".*Join.*" will remove the entire line having word Join
     REGEX_PATTERNS = []  
