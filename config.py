@@ -18,14 +18,14 @@ class Config(object):
     WORDS_TO_REMOVE = []  
     # a list of regex pattern strings to remove from the existing caption. 
     # For eg. r".*Join.*" will remove the entire line having word Join
-    REGEX_PATTERNS = []  
+    REGEX_PATTERNS = [@]  
 
     # keep empty to allow in all channels. Can add multiple channels separated by a comma.
     # Don't forget -100 before the channel ID
     ALLOWED_CHANNELS = []
 
     # REMOVE or POSTFIX or NIL. Useful for tamilblasters, tamilmv and other webites
-    WEBSITE_PREFIX = "POSTFIX"  
+    WEBSITE_PREFIX = "REMOVE"  
 
     # True or False. Replaces YIFY website with YTS
     YTS_WEBSITE_REPLACE = True 
