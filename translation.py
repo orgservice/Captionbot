@@ -2,21 +2,16 @@ class Translation(object):
     START_TEXT = """
 Hi __{}__ , 
 
-__I Am Auto Caption Bot__
+__I Am Auto Caption Remover Bot__
 
-__I can automatically remove or add caption to the files posted in the channels.__
+__I can automatically remove caption to the files posted in the channels.__
 
-**Maintained by __@{}__**
 """
 
     HELP_TEXT = """
 <u><b>Help</b></u> 
 
 <i>Add me as an Admin in your channel with edit permission</i>
-
-<i>Add your caption in .env/config var</i>
-   
-<i>[Supports Markdown]</i>
 
 <i>Forward your files in your channel and I will edit it</i>
 
@@ -27,12 +22,12 @@ __I can automatically remove or add caption to the files posted in the channels.
     ABOUT_TEXT = """
 **About Me**
 
-__My Name: AutoCaptionBot
+__My Name: ORGCaptionBot
 Language : Python 
 Framework : Pyrogram
 Server : Heroku
 Version : 2.0.1
-Creator :  @shubham_indalkar__
+Creator :  @ORGsupport__
  
 """
 
@@ -59,23 +54,13 @@ Creator :  @shubham_indalkar__
     # Bot status display
 
     STATUS_DATA = """
-<u><b>Bot Status</b></u>
-
-<b>Current Caption :</b> 
-{}
-
-<b>Current Position :</b> <i>{}</i>
-
+<b>Current Caption : None</b>
 """
 
     SOURCE_TEXT = """
 
-<b> I Am Available Open Source on Github 
-      Click Below Link And Deploy Me Now </b>
-
-<i>DEPLOY</i> : <b><a href="https://heroku.com/deploy?template=https://github.com/avipatilpro/Caption-Bot">On Heroku</a></b>    
-
-<i>SOURCE</i> : <b><a href="https://github.com/avipatilpro/Caption-Bot">Caption Bot</a></b>  
+<b> I Am Available Paid Source Code.... 
+DM @ORGSupport for Buy Source Code</b>
 """
 
     # Removed text display
@@ -83,7 +68,6 @@ Creator :  @shubham_indalkar__
     REMOVED_TEXT = """
 <u><b>Bot Status</b></u>
 
-<b>Removed text :</b> 
-<i>{}</i>
+<b>Removed text : ALL</b> 
 
 """
