@@ -25,7 +25,7 @@ class Config(object):
     ALLOWED_CHANNELS = []
 
     # REMOVE or POSTFIX or NIL. Useful for tamilblasters, tamilmv and other webites
-    WEBSITE_PREFIX = "REMOVE"  
+    WEBSITE_PREFIX = "NIL"  
 
     # True or False. Replaces YIFY website with YTS
     YTS_WEBSITE_REPLACE = True 
