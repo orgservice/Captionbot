@@ -15,10 +15,10 @@ class Config(object):
     ADMIN_USERNAME = "adultsupport"  # without "@". 
 
     # a list of strings of words to remove from the existing caption
-    WORDS_TO_REMOVE = []  
+    WORDS_TO_REMOVE = ["💥Join:- @ViSHWA_MOViEX", "🍿 𝖩𝗈𝗂𝗇  ➥ 「 @RJMoviessWorld 」"]  
     # a list of regex pattern strings to remove from the existing caption. 
     # For eg. r".*Join.*" will remove the entire line having word Join
-    REGEX_PATTERNS = ["@"]  
+    REGEX_PATTERNS = []  
 
     # keep empty to allow in all channels. Can add multiple channels separated by a comma.
     # Don't forget -100 before the channel ID
