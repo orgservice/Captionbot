@@ -9,7 +9,7 @@ class Config(object):
     
     # db vars
     # keep empty if don't want to add any extra caption
-    CAPTION_TEXT = "*⏤͟͞𝗝⌡𝗼𝗶𝗻 𝗣𝗿𝗲𝗺𝗶𝘂𝗺* –「 @ORGPrime 」"  
+    CAPTION_TEXT = "⏤͟͞𝗝⌡𝗼𝗶𝗻 𝗣𝗿𝗲𝗺𝗶𝘂𝗺 –「 @ORGPrime 」"  
     # BOTTOM or TOP or NIL
     CAPTION_POSITION = "BOTTOM"  
     ADMIN_USERNAME = "adultsupport"  # without "@". 
