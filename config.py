@@ -9,7 +9,7 @@ class Config(object):
     
     # db vars
     # keep empty if don't want to add any extra caption
-    CAPTION_TEXT = "#𝙊𝙍𝙂𝙋𝙧𝙞𝙢𝙚 – #𝙉𝙤𝟏 𝙏𝙚𝙡𝙚𝙜𝙧𝙖𝙢 𝙋𝙧𝙚𝙢𝙞𝙪𝙢 𝙈𝙤𝙫𝙞𝙚𝙨 𝘼𝙣𝙙 𝙒𝙚𝙗 𝙎𝙚𝙧𝙞𝙚𝙨 𝙀𝙣𝙩𝙚𝙧𝙩𝙖𝙞𝙣𝙢𝙚𝙣𝙩 𝘾𝙝𝙖𝙣𝙣𝙚𝙡.\n\n<b><i>⏤͟͞𝗝⌡𝗼𝗶𝗻 𝗣𝗿𝗲𝗺𝗶𝘂𝗺</i> –「 @ORGPrime 」</b>"  
+    CAPTION_TEXT = "*⏤͟͞𝗝⌡𝗼𝗶𝗻 𝗣𝗿𝗲𝗺𝗶𝘂𝗺* –「 @ORGPrime 」"  
     # BOTTOM or TOP or NIL
     CAPTION_POSITION = "BOTTOM"  
     ADMIN_USERNAME = "adultsupport"  # without "@". 
