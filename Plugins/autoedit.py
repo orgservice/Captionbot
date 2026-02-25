@@ -40,7 +40,7 @@ def clean_caption_text(text: str) -> str:
         base_name = re.sub(r'\s+', ' ', base_name).strip()
         clean_text = base_name + extension
     else:
-        clean_text = clean_text.replace('_', ' ').replace('.', ' ')
+        clean_text = clean_text.replace('_', ' ')
         clean_text = re.sub(r'\s+', ' ', clean_text).strip()
 
     if clean_text:
