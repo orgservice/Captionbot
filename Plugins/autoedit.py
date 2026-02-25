@@ -88,7 +88,7 @@ async def handle_auto_edit(client: Client, message: Message) -> None:
                 caption=f"<b>{cleaned_text}</b>", 
                 parse_mode=enums.ParseMode.HTML 
             )
-            logger.info(f"Edited caption for message ID {message.id} in chat {message.chat.id}")
+            # logger.info(f"Edited caption for message ID {message.id} in chat {message.chat.id}")
             break 
             
         except FloodWait as e:
