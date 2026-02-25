@@ -12,21 +12,26 @@ logger = logging.getLogger(__name__)
 def clean_caption_text(text: str) -> str:
     """
     Cleans the caption by strictly isolating the filename/title.
-    Removes URLs, extensions, and Telegram handles.
+    Removes URLs, extensions, Telegram handles, emojis, brackets, and replaces underscores/dots.
     """
     if not text:
         return ""
 
-    # 1. Remove URLs (Matches http://, https://, AND www.)
+    # 1. Remove Emojis and Special Symbols (like ©, ®, ™, ⚠)
+    text = re.sub(r'[\U00010000-\U0010FFFF]', '', text) 
+    text = re.sub(r'[\u2600-\u27BF]', '', text)         
+    text = re.sub(r'[©®™⚠]', '', text)                 
+
+    # 2. Remove URLs (Matches http://, https://, AND www.)
     text = re.sub(r'(?:https?://|www\.)\S+', '', text)
     
-    # 2. Remove any stray Telegram @usernames
-    text = re.sub(r'@[a-zA-Z0-9_]+', '', text)
+    # 3. Remove Telegram @usernames ALONG WITH surrounding brackets/parentheses
+    text = re.sub(r'[\[\(]?\s*@[a-zA-Z0-9_]+\s*[\]\)]?', '', text)
     
-    # 3. Clean up stray leading spaces, hyphens, pipes, or colons left behind after removing URLs
-    text = re.sub(r'^[\s\-|_:]+', '', text)
-
-    # 4. Extract content strictly up to the media extension
+    # 4. Clean up any empty brackets/parentheses left behind
+    text = re.sub(r'\[\s*\]|\(\s*\)|\{\s*\}', '', text)
+    
+    # 5. Extract content strictly up to the media extension
     match = re.search(r'([^\n]*?\.(?:mkv|mp4|avi|mka|zip|rar|pdf|webm))', text, flags=re.IGNORECASE)
     
     if match:
@@ -36,10 +41,30 @@ def clean_caption_text(text: str) -> str:
         lines = [line.strip() for line in text.split('\n') if line.strip()]
         clean_text = lines[0] if lines else ""
 
-    # Clean leading characters again just in case the regex extraction left some behind
-    clean_text = re.sub(r'^[\s\-|_:]+', '', clean_text).strip()
+    # 6. Aggressive leading character cleanup:
+    clean_text = re.sub(r'^[^a-zA-Z0-9\[\(]+', '', clean_text).strip()
 
-    # 5. Escape HTML characters (like <, >, &) to prevent Telegram HTML parse errors 
+    # 7. Format the filename by replacing underscores and dots with spaces (excluding the extension)
+    last_dot_idx = clean_text.rfind('.')
+    if last_dot_idx != -1:
+        # Separate the name from the extension
+        base_name = clean_text[:last_dot_idx]
+        extension = clean_text[last_dot_idx:]
+        
+        # Replace underscores and dots with spaces in the base name
+        base_name = base_name.replace('_', ' ').replace('.', ' ')
+        
+        # Clean up any accidental double spaces created during replacement
+        base_name = re.sub(r'\s+', ' ', base_name).strip()
+        
+        # Reattach the extension
+        clean_text = base_name + extension
+    else:
+        # If no extension is found, just replace everything
+        clean_text = clean_text.replace('_', ' ').replace('.', ' ')
+        clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+
+    # 8. Escape HTML characters (like <, >, &) to prevent Telegram HTML parse errors 
     if clean_text:
         clean_text = html.escape(clean_text)
     
@@ -53,7 +78,7 @@ media_filter = filters.channel & (
 @Client.on_message(media_filter, group=-1)
 @Client.on_edited_message(media_filter, group=-1)
 async def handle_auto_edit(client: Client, message: Message) -> None:
-    # ... (Keep the rest of your handle_auto_edit function exactly the same as before) ...
+    """Listens for new channel posts and edits them automatically with HTML support."""
     
     # Check if restricted to specific channels
     if Config.ALLOWED_CHANNELS and message.chat.id not in Config.ALLOWED_CHANNELS:
