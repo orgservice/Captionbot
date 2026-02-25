@@ -3,7 +3,7 @@ import asyncio
 from aiohttp import web
 from pyrogram import Client, enums, idle
 from config import Config
-from Plugins import web_server  # Import the web_server from your new __init__.py
+from Plugins import web_server
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,7 +24,7 @@ class AutoCaptionBot(Client):
             parse_mode=enums.ParseMode.HTML
         )
 
-async def start_services():
+async def start():
     """Starts both the aiohttp web server and the Pyrogram client."""
     try:
         # 1. Start Web Server from Plugins/__init__.py
@@ -38,7 +38,7 @@ async def start_services():
         # 2. Start Telegram Bot
         bot = AutoCaptionBot()
         await bot.start()
-        logger.info("⚡ Caption Bot Started 🚀")
+        logger.info("⚡ Bot Started Successfully 🚀")
         
         # Keep the services running
         await idle()
@@ -49,9 +49,9 @@ async def start_services():
         # Graceful shutdown
         await bot.stop()
         await runner.cleanup()
-        logger.info("Bot and Web Server have been shut down securely.")
+        logger.info("🤖 Bot have been shut down securely.")
 
 if __name__ == "__main__":
     # Start the async event loop
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_services())
+    loop.run_until_complete(start())
