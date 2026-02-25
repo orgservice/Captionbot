@@ -1,7 +1,9 @@
 import re
 import html
 import logging
+import asyncio # Imported for FloodWait sleep
 from pyrogram import filters, Client, enums
+from pyrogram.errors import FloodWait # Imported to handle rate limits
 from pyrogram.types import Message
 from config import Config
 
@@ -40,9 +42,9 @@ def clean_caption_text(text: str) -> str:
     
     return clean_text
 
-# Define filter for channel messages containing media or text
+# Define filter for channel messages to strictly ONLY trigger on Document or Video
 media_filter = filters.channel & (
-    filters.document | filters.video | filters.audio | filters.photo | filters.text
+    filters.document | filters.video
 )
 
 @Client.on_message(media_filter, group=-1)
@@ -65,21 +67,31 @@ async def handle_auto_edit(client: Client, message: Message) -> None:
     if html.unescape(cleaned_text) == original_text.strip():
         return
 
-    try:
-        if message.caption:
-            await client.edit_message_caption(
-                chat_id=message.chat.id,
-                message_id=message.id,
-                caption=f"<b>{cleaned_text}</b>", # Adding bold HTML styling as an example
-                parse_mode=enums.ParseMode.HTML 
-            )
-        elif message.text:
-            await client.edit_message_text(
-                chat_id=message.chat.id,
-                message_id=message.id,
-                text=f"<b>{cleaned_text}</b>", # Adding bold HTML styling as an example
-                parse_mode=enums.ParseMode.HTML
-            )
-        logger.info(f"Cleaned caption for message ID {message.id} in chat {message.chat.id}")
-    except Exception as e:
-        logger.error(f"Error editing caption for message ID {message.id}: {e}")
+    # Implement retry mechanism for FloodWait during bulk uploads
+    while True:
+        try:
+            if message.caption:
+                await client.edit_message_caption(
+                    chat_id=message.chat.id,
+                    message_id=message.id,
+                    caption=f"<b>{cleaned_text}</b>", # Adding bold HTML styling as an example
+                    parse_mode=enums.ParseMode.HTML 
+                )
+            elif message.text: # Kept as a fallback, though text messages are filtered out now
+                await client.edit_message_text(
+                    chat_id=message.chat.id,
+                    message_id=message.id,
+                    text=f"<b>{cleaned_text}</b>", 
+                    parse_mode=enums.ParseMode.HTML
+                )
+            logger.info(f"Cleaned caption for message ID {message.id} in chat {message.chat.id}")
+            break # Success, exit the retry loop
+            
+        except FloodWait as e:
+            logger.warning(f"FloodWait triggered! Sleeping for {e.value} seconds before retrying...")
+            await asyncio.sleep(e.value)
+            # After sleeping, the loop continues and retries the edit
+            
+        except Exception as e:
+            logger.error(f"Error editing caption for message ID {message.id}: {e}")
+            break # Exit loop on unrecoverable errors to prevent infinite looping
