@@ -1,33 +1,34 @@
-<h1 align='center'>🖊️ TG AutoCaption Bot </h1>
+<h1 align='center'>🖊️ TG AutoCaption Remover Bot </h1>
 
 <h4 align='center'>
-    Telegram Bot for Auto Captioning Files & Videos with Custom Text<br><br>
+    Telegram Bot for Automatically Cleaning and Formatting Media Captions<br><br>
     <i>(Exclusive to public or private Telegram channels)</i> 
 </h4><br>
 
 ## Overview
 
-TG AutoCaption Bot is a Telegram bot designed to automatically caption files and videos in your channels. With customizable settings, it can add and remove certain text from the caption.
+TG AutoCaption Remover Bot is a Telegram bot designed to automatically clean up files and videos posted in your channels. Instead of adding custom text, it strips away unwanted clutter (like URLs and Telegram handles) and isolates the pure file name, formatting it neatly in bold.
+
+## Features
+
+- **Filename Extraction:** Strictly extracts the media title up to its extension (e.g., .mkv, .mp4, .zip, .pdf).
+- **Link & Tag Removal:** Automatically removes HTTP/HTTPS links and stray `@usernames` from the caption.
+- **HTML Formatting:** Formats the cleaned filename in bold HTML (`<b>filename</b>`) for a cleaner look.
+- **Channel Restriction:** Can be configured to work globally or restricted to specific allowed channels.
 
 ## Configuration
 
 1. **Create a Bot on Telegram:**
    - Start by creating a new bot on Telegram using [@BotFather](https://t.me/BotFather).
-   - After creating the bot, add it to your channel and grant it "Manage Messages" admin rights.
+   - After creating the bot, add it to your channel and grant it "Edit Messages" admin rights.
 
-2. **Edit the `config.py` file:**
-   - Customize the bot behavior according to your preferences by editing the `config.py` file.
-   - Below are some key configuration options:
-
-     - `CAPTION_TEXT`: Caption to be added below the file (Markdown supported).
-     - `CAPTION_POSITION`: Position of the caption relative to the file name (TOP or BOTTOM or NIL).
-     - `ADMIN_USERNAME`: Username to display in bot PM (without "@").
-     - `WORDS_TO_REMOVE`: List of words to remove from existing captions.
-     - `REGEX_PATTERNS`: List of regex patterns to remove from existing captions.
-     - `ALLOWED_CHANNELS`: List of channel IDs to allow the bot. Leave empty to allow in all channels.
-     - `WEBSITE_PREFIX`: Decide what to do with the caption text if it starts with a website (REMOVE or POSTFIX or NIL).
-     - `YTS_WEBSITE_REPLACE`: Replace YIFY website credits with YTS (True or False).
-     - `REPLACE_DICTIONARY`: Dictionary of key value pairs of original word in the caption to replace with another word.
+2. **Environment Variables (`config.py`):**
+   - Customize the bot behavior by setting the following environment variables:
+     - `BOT_TOKEN`: Your Telegram Bot Token from @BotFather.
+     - `API_ID`: Your Telegram API ID (from my.telegram.org).
+     - `API_HASH`: Your Telegram API Hash (from my.telegram.org).
+     - `ADMIN_USERNAME`: Username to display for the admin (without "@").
+     - `ALLOWED_CHANNELS`: Comma-separated list of channel IDs where the bot is allowed to work. Leave empty to allow in all channels.
 
 ## Deployment
 
@@ -43,7 +44,7 @@ TG AutoCaption Bot is a Telegram bot designed to automatically caption files and
      ```
 
 3. **Configure variables:**
-   - Edit the `config.py` file to set up your bot according to your preferences.
+   - Set up your environment variables or edit the `config.py` file.
 
 4. **Run the bot:**
    - Start the bot by running the following command in your terminal:
@@ -51,16 +52,16 @@ TG AutoCaption Bot is a Telegram bot designed to automatically caption files and
      python3 bot.py
      ```
 
+### Heroku Deployment
+The repository includes an `app.json` and `Procfile`, making it ready for 1-click deployment on Heroku. Ensure you fill in the required `BOT_TOKEN`, `API_ID`, and `API_HASH` in the Heroku dashboard.
+
 ## Commands
 
-- `/start`: Start the bot.
-- `/help`: Get assistance on using the bot.
-- `/about`: Learn more about the bot.
-- `/source`: View the source code.
+- `/start`: Starts the bot and displays the welcome message with usage instructions.
 
 ## Credits
 
-This repository is a modification of [Caption Bot](https://github.com/avipatilpro/Caption-Bot) by [avipatilpro](https://github.com/avipatilpro). Special thanks for the original implementation.
+This repository is a modification of Caption Bot by avipatilpro. Special thanks for the original implementation.
 
 ## License
 
