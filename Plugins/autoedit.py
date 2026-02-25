@@ -10,171 +10,83 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Load configuration values
-user_caption_position = Config.CAPTION_POSITION
-caption_position = user_caption_position.lower()
-caption_text = Config.CAPTION_TEXT
 allowed_channels = Config.ALLOWED_CHANNELS
-words_to_remove = Config.WORDS_TO_REMOVE
-regex_patterns = Config.REGEX_PATTERNS
-website_prefix = Config.WEBSITE_PREFIX
-yts_website_replace = Config.YTS_WEBSITE_REPLACE
-replace_dictionary = Config.REPLACE_DICTIONARY
-separator_space = Config.SEPARATOR_SPACE
 
-def process_caption(text, words_to_remove, regex_patterns):
+def clean_caption_text(text):
     """
-    Process the caption or text by removing specified words and applying regex patterns.
-
-    Args:
-        text (str): The input text.
-        words_to_remove (list): List of words to be removed.
-        regex_patterns (list): List of regex patterns to be applied.
-
-    Returns:
-        str: The processed text.
+    Cleans the caption by strictly isolating the filename/title.
+    If an extension is found, it cuts off everything after it.
+    If NO extension is found, it aggressively takes ONLY the first line.
     """
-    if words_to_remove:
-        # Remove words without regex
-        for word in words_to_remove:
-            text = text.replace(word, "")
-            text = text.strip("\n")  # remove the next line
+    if not text:
+        return ""
 
-    if regex_patterns:
-        # Remove words using regex patterns
-        for pattern in regex_patterns:
-            text = re.sub(pattern, "", text)
-            text = text.strip("\n")  # remove the next line
+    # 1. Clean out any raw HTTP/HTTPS links from the whole text right away
+    text = re.sub(r'http[s]?://\S+', '', text)
     
-    # Remove website prefixes from caption
-    if website_prefix == "REMOVE":
-        # Capture everything until the first occurrence of "- " before the file extension
-        text = re.sub(r'(.*?)- (.*)\.(mkv|mp4|avi)', r'\2.\3', text, flags=re.IGNORECASE)
-    # Remove website prefix and add it as postfix
-    elif website_prefix == "POSTFIX":
-        # Capture the middle section of the link and add it before the file extension
-        text = re.sub(r'www\.(.*?)\..*?( - |\.)(.*?)(\.mkv|\.mp4|\.avi)', r'\3 - \1\4', text, flags=re.IGNORECASE)
+    # 2. Check for an extension (.mkv, .mp4, etc.)
+    # This grabs the line from the beginning up to the extension and stops.
+    match = re.search(r'([^\n]*?\.(?:mkv|mp4|avi|mka|zip|rar|pdf|webm))', text, flags=re.IGNORECASE)
     
-    if yts_website_replace:
-        text = re.sub(r'\[YTS\.\w+\]', 'YTS', text, re.IGNORECASE)
-    
-    if separator_space:
-        if ' ' not in text:
-            splitted_text = text.split('.')
-            space_separated_text = ''
+    if match:
+        # Scenario A: Extension FOUND.
+        # Keep exactly up to the extension and drop the rest.
+        clean_text = match.group(1).strip()
+    else:
+        # Scenario B: NO extension found (e.g., Bloody.Babu...H.264-Archie)
+        # Aggressive fallback: Split the caption by newlines, ignore empty lines, 
+        # and strictly keep ONLY the very first line.
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+        if lines:
+            clean_text = lines[0]
+        else:
+            clean_text = ""
 
-            for word in splitted_text:
-                if word in ['5', '1', '0', '2', 'mkv', 'mp4', 'avi']:
-                    if word == '5':
-                        space_separated_text += ' 5.1'
-                    elif word == '2':
-                        space_separated_text += ' 2.0'
-                    elif word == 'mkv':
-                        space_separated_text += '.mkv'
-                    elif word == 'mp4':
-                        space_separated_text += '.mp4'
-                    elif word == 'avi':
-                        space_separated_text += '.avi'
-                elif word in ['org', 'Org', 'in', 'In', 'com', 'Com', 'net', 'Net', 'cc', 'Cc', 'shop', 'Shop', 'to', 'To', 'li', 'Li', 'me', 'Me', 'mom', 'Mom']:
-                    space_separated_text += f'.{word}'        
-                else:
-                    space_separated_text += f' {word}'
-        
-            text = space_separated_text
-            text = text.strip('\n')  # remove the next line
-    
-    # Apply REPLACE_DICTIONARY replacements
-    if replace_dictionary:
-        for original_word, replacement_word in replace_dictionary.items():
-            text = text.replace(original_word, replacement_word)
-            text = text.strip("\n")  # remove the next line
+    # 3. Final polish: Remove any stray Telegram @usernames just in case 
+    # someone put "@Channel MovieName" on the first line.
+    clean_text = re.sub(r'@[a-zA-Z0-9_]+', '', clean_text).strip()
 
-    # Ensure the modified text is not empty
-    if text.strip():
-        text = f"**{text}**"
+    return clean_text
 
-    return text
-
-# Define filters for messages
-f = filters.channel & (filters.document | filters.video | filters.audio | filters.text | filters.photo)
+# Define filters for messages containing media or text
+f = filters.channel & (filters.document | filters.video | filters.audio | filters.photo | filters.text)
 
 @AutoCaptionBot.on_message(f, group=-1)
 @AutoCaptionBot.on_edited_message(f, group=-1)
 async def editing(bot, message):
-    try:
-        # Identify the media type in the message
-        media = message.document or message.video or message.audio or message.photo or message.text
-        caption_text = f"**{Config.CAPTION_TEXT}**"  # made added caption bold
-    except:
-        caption_text = ""
-        pass
-
     # Check if the current channel is in the list of allowed channels
     if allowed_channels and message.chat.id not in allowed_channels:
-        logger.info("Message from a non-allowed channel. Ignoring.")
         return
 
-    # Process the caption or text
-    if media:
-        if message.caption:
-            file_caption = process_caption(message.caption, words_to_remove, regex_patterns)
-        elif message.text:
-            message_text = process_caption(message.text, words_to_remove, regex_patterns)
-        else:
-            fname = media.file_name
-            filename = fname.replace("_", " ").replace("@", "")
-            file_caption = f"`{filename}`"
+    # Extract the original text/caption from the post
+    original_text = message.caption if message.caption else message.text
+    
+    if not original_text:
+        return
+
+    # Clean the text using our perfect cleaning function
+    cleaned_text = clean_caption_text(original_text)
+
+    # Check if the text actually changed to prevent unnecessary API calls
+    if cleaned_text.strip() == original_text.strip():
+        return
 
     try:
-        # Edit the caption based on the configured position
-        if caption_position == "top":
-            final_caption = ""
-            if message.caption:
-                final_caption = caption_text + "\n\n" + file_caption 
-            elif message.text:
-                final_caption = caption_text + "\n\n" + message_text 
-
-            # Edit the message caption if it's not empty
-            if final_caption.strip():
-                try:
-                    await bot.edit_message_caption(
-                        chat_id=message.chat.id,
-                        message_id=message.id,
-                        caption=final_caption,
-                        parse_mode=enums.ParseMode.MARKDOWN,
-                    )
-                except Exception as e:
-                    logger.error(f"Error editing caption: {e}")
-
-        elif caption_position == "bottom":
-            final_caption = ""
-            if message.caption:
-                final_caption = file_caption + "\n\n" + caption_text
-            elif message.text:
-                final_caption = message_text + "\n\n" + caption_text
-
-            # Edit the message caption if it's not empty
-            if final_caption.strip():
-                try:
-                    await bot.edit_message_caption(
-                        chat_id=message.chat.id,
-                        message_id=message.id,
-                        caption=final_caption,
-                        parse_mode=enums.ParseMode.MARKDOWN,
-                    )
-                except Exception as e:
-                    logger.error(f"Error editing caption: {e}")
-
-        elif caption_position == "nil":
-            # Edit the message caption with only the configured caption text
-            try:
-                await bot.edit_message_caption(
-                    chat_id=message.chat.id,
-                    message_id=message.id,
-                    caption=caption_text,
-                    parse_mode=enums.ParseMode.MARKDOWN,
-                )
-            except Exception as e:
-                logger.error(f"Error editing caption: {e}")
+        # Edit the message with the perfectly cleaned text
+        if message.caption:
+            await bot.edit_message_caption(
+                chat_id=message.chat.id,
+                message_id=message.id,
+                caption=cleaned_text,
+                parse_mode=enums.ParseMode.DISABLED # Prevents markdown from triggering on "_" or "*" characters
+            )
+        elif message.text:
+            await bot.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=message.id,
+                text=cleaned_text,
+                parse_mode=enums.ParseMode.DISABLED
+            )
+        logger.info(f"Successfully cleaned caption for message {message.id}")
     except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
+        logger.error(f"Error editing caption: {e}")
