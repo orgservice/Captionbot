@@ -1,16 +1,16 @@
 import logging
+from pyrogram import Client, enums
+from config import Config
 
+# Configure application-wide logging
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
-
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-
 logger = logging.getLogger(__name__)
 
-from config import Config
-from pyrogram import Client
+# Suppress overly verbose Pyrogram logs
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 class AutoCaptionBot(Client):
     def __init__(self):
@@ -21,20 +21,19 @@ class AutoCaptionBot(Client):
             api_hash=Config.API_HASH,
             workers=20,
             plugins=dict(root="Plugins"),
+            parse_mode=enums.ParseMode.HTML # Global HTML support enabled
         )
-        
-        # Enable additional logging for Pyrogram
-        self.log_verbosity = logging.INFO
 
     def run(self):
+        """Starts the Pyrogram client safely."""
         try:
-            logger.info("Bot is starting...")
+            logger.info("⚡ Caption Bot Started 🚀")
             super().run()
-            logger.info("Bot is up and running.")
         except Exception as e:
-            logger.error(f"An error occurred during bot execution: {e}")
+            logger.error(f"❌ Bot Stoped: {e}", exc_info=True)
         finally:
-            logger.info("Bot is shutting down.")
+            logger.info("Bot has been shut down securely.")
 
 if __name__ == "__main__":
-    AutoCaptionBot().run()
+    app = AutoCaptionBot()
+    app.run()
