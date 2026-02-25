@@ -36,11 +36,11 @@ def clean_caption_text(text: str) -> str:
     if last_dot_idx != -1:
         base_name = clean_text[:last_dot_idx]
         extension = clean_text[last_dot_idx:]
-        base_name = base_name.replace('_', ' ').replace('.', ' ')
+        base_name = base_name.replace('_', ' ')
         base_name = re.sub(r'\s+', ' ', base_name).strip()
         clean_text = base_name + extension
     else:
-        clean_text = clean_text.replace('_', ' ')
+        clean_text = clean_text.replace('_', ' ').replace('.', ' ')
         clean_text = re.sub(r'\s+', ' ', clean_text).strip()
 
     if clean_text:
