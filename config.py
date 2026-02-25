@@ -13,3 +13,7 @@ class Config:
     ALLOWED_CHANNELS = [
         int(ch.strip()) for ch in allowed_channels.split(",") if ch.strip()
     ] if allowed_channels else []
+
+    # Web Server configuration for Koyeb deployment
+    PORT = int(os.environ.get("PORT", "8080"))
+    WEB_RESPONSE = {"status": "Auto Caption Remover Bot is Running Successfully!"}
