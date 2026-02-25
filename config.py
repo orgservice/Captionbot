@@ -1,13 +1,15 @@
 import os
 
-class Config(object):
-    # env vars
-    BOT_TOKEN = "8500309733:AAGsP86c3ab0V8mcJR3p6azLwCksPdfQKW8"  # string
-    API_ID = 25465082 # int
-    API_HASH = "4a6b5e40c8bc08c8af09add6cca23b18"  # string
+class Config:
+    # Fetching secrets from environment variables
+    BOT_TOKEN = os.environ.get("BOT_TOKEN", "8500309733:AAGsP86c3ab0V8mcJR3p6azLwCksPdfQKW8")
+    API_ID = int(os.environ.get("API_ID", "25465082"))
+    API_HASH = os.environ.get("API_HASH", "4a6b5e40c8bc08c8af09add6cca23b18")
     
-    ADMIN_USERNAME = "HIT_Sir"  # without "@". 
+    ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "HIT_Sir") # without @
 
-    # keep empty to allow in all channels. Can add multiple channels separated by a comma.
-    # Don't forget -100 before the channel ID
-    ALLOWED_CHANNELS = []
+    # Parses comma-separated channel IDs. Example: "-1001234567890, -1009876543210"
+    _allowed_channels_env = os.environ.get("ALLOWED_CHANNELS", "")
+    ALLOWED_CHANNELS = [
+        int(ch.strip()) for ch in _allowed_channels_env.split(",") if ch.strip()
+    ] if _allowed_channels_env else []
