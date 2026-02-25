@@ -12,11 +12,8 @@ async def start_command(client: Client, message: Message) -> None:
     welcome_text = (
         f"👋 Hi <b>{user_name}</b>,\n\n"
         "<b>I am the Auto Caption Remover Bot!</b> 🤖\n\n"
-        "I can automatically clean and remove unwanted captions from files "
-        "posted in your channels.\n\n"
-        "<u><b>How to use:</b></u>\n"
-        "Just add me as an Admin in your channel with <i>Edit Messages</i> permission, "
-        "and I will handle the rest automatically!"
+        "💡 <u><b>How to use:</b></u>\n"
+        "<i>Just add me as an Admin in your channel with Edit Messages permission, and I will handle the rest automatically!</i>"
     )
 
     await message.reply_text(
