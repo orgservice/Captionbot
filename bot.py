@@ -1,6 +1,9 @@
 import logging
-from pyrogram import Client, enums
+import asyncio
+from aiohttp import web
+from pyrogram import Client, enums, idle
 from config import Config
+from Plugins import web_server  # Import the web_server from your new __init__.py
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,16 +24,34 @@ class AutoCaptionBot(Client):
             parse_mode=enums.ParseMode.HTML
         )
 
-    def run(self):
-        """Starts the Pyrogram client."""
-        try:
-            logger.info("⚡ Caption Bot Started 🚀")
-            super().run()
-        except Exception as e:
-            logger.error(f"❌ Bot Stopped: {e}", exc_info=True)
-        finally:
-            logger.info("Bot has been shut down securely.")
+async def start_services():
+    """Starts both the aiohttp web server and the Pyrogram client."""
+    try:
+        # 1. Start Web Server from Plugins/__init__.py
+        app = await web_server()
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "0.0.0.0", Config.PORT)
+        await site.start()
+        logger.info(f"🌐 Web Server Started on Port: {Config.PORT}")
+
+        # 2. Start Telegram Bot
+        bot = AutoCaptionBot()
+        await bot.start()
+        logger.info("⚡ Caption Bot Started 🚀")
+        
+        # Keep the services running
+        await idle()
+        
+    except Exception as e:
+        logger.error(f"❌ Error occurred: {e}", exc_info=True)
+    finally:
+        # Graceful shutdown
+        await bot.stop()
+        await runner.cleanup()
+        logger.info("Bot and Web Server have been shut down securely.")
 
 if __name__ == "__main__":
-    app = AutoCaptionBot()
-    app.run()
+    # Start the async event loop
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_services())
