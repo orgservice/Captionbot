@@ -9,7 +9,7 @@ class Config:
     ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "HIT_Sir") # without @
 
     # Parses comma-separated channel IDs. Example: "-1001234567890, -1009876543210"
-    _allowed_channels_env = os.environ.get("ALLOWED_CHANNELS", "")
+    allowed_channels = os.environ.get("ALLOWED_CHANNELS", "")
     ALLOWED_CHANNELS = [
-        int(ch.strip()) for ch in _allowed_channels_env.split(",") if ch.strip()
-    ] if _allowed_channels_env else []
+        int(ch.strip()) for ch in allowed_channels.split(",") if ch.strip()
+    ] if allowed_channels else []
