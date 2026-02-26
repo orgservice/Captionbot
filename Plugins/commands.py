@@ -5,8 +5,7 @@ from pyrogram.types import (
     Message, 
     CallbackQuery, 
     InlineKeyboardMarkup, 
-    InlineKeyboardButton, 
-    LinkPreviewOptions
+    InlineKeyboardButton
 )
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ async def start_command(client: Client, message: Message) -> None:
         "chat_id": message.chat.id,
         "text": welcome_text,
         "parse_mode": "HTML",
-        "link_preview_options": {"is_disabled": True},
+        "disable_web_page_preview": True,
         "reply_to_message_id": message.id,
         "reply_markup": {
             "inline_keyboard": [
@@ -96,7 +95,7 @@ async def handle_callbacks(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text=about_text,
             parse_mode=enums.ParseMode.HTML,
-            link_preview_options=LinkPreviewOptions(is_disabled=True),
+            disable_web_page_preview=True,
             reply_markup=reply_markup
         )
 
@@ -121,7 +120,7 @@ async def back_to_start_callback(client: Client, query: CallbackQuery):
         "message_id": query.message.id, # We specify the message_id to EDIT it
         "text": welcome_text,
         "parse_mode": "HTML",
-        "link_preview_options": {"is_disabled": True},
+        "disable_web_page_preview": True,
         "reply_markup": {
             "inline_keyboard": [
                 [
