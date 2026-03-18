@@ -3,7 +3,7 @@ import os
 
 class Config(object):
     # env vars
-    BOT_TOKEN = "7372474546:AAHY6OwSess3qxfP886CGKKWVVItZohX1KM"  # string
+    BOT_TOKEN = "8500309733:AAGsP86c3ab0V8mcJR3p6azLwCksPdfQKW8"  # string
     API_ID = 25465082 # int
     API_HASH = "4a6b5e40c8bc08c8af09add6cca23b18"  # string
     
@@ -12,10 +12,10 @@ class Config(object):
     CAPTION_TEXT = ""  
     # BOTTOM or TOP or NIL
     CAPTION_POSITION = "BOTTOM"  
-    ADMIN_USERNAME = "adultsupport"  # without "@". 
+    ADMIN_USERNAME = "hit_sir"  # without "@". 
 
     # a list of strings of words to remove from the existing caption
-    WORDS_TO_REMOVE = ["✨Join:- @ViSHWA_MOViEX","🔸 Upload By [@The_Silent_Teams]", "⚡️Join:- [@ViSHWA_MOViEX]", "©@piro_files & 🤖@piroxbots", "@piro_files", "@piroxbots", "⚡ Join :- [@flimyworld_17]", "💥Join:- @ViSHWA_MOViEX", "🍿 𝖩𝗈𝗂𝗇  ➥ 「 @RJMoviessWorld 」"]  
+    WORDS_TO_REMOVE = ["📌 @DOZOEMPIRE","— Having Problem with Opening Link... Text me Here 👉 @DozoPrimeBot 💬"]  
     # a list of regex pattern strings to remove from the existing caption. 
     # For eg. r".*Join.*" will remove the entire line having word Join
     REGEX_PATTERNS = []  
