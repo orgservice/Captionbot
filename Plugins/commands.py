@@ -1,161 +1,239 @@
 import logging
-import aiohttp
-from pyrogram import filters, Client, enums
-from pyrogram.types import (
-    Message, 
-    CallbackQuery, 
-    InlineKeyboardMarkup, 
-    InlineKeyboardButton
-)
+from pyrogram import filters, enums
+from bot import AutoCaptionBot
+from config import Config
+from translation import Translation
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.command("start") & filters.private)
-async def start_command(client: Client, message: Message) -> None:
-    """Handles the /start command to welcome users using HTML formatting."""
-    user_name = message.from_user.first_name if message.from_user else "User"
-    
-    welcome_text = (
-        f"👋 Hi <b>{user_name}</b>,\n\n"
-        "<b>I am the Auto Caption Cleaner Bot!</b> 🤖\n\n"
-        "💡 <u><b>How to use:</b></u>\n"
-        "<i>Just add me as an Admin in your channel with Edit Messages permission, and I will handle the rest automatically!</i>"
+# variable to keep track of the original command
+original_command = None
+
+# all buttons
+
+# start buttons
+start_button = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton("🖋 Current Caption", callback_data="status_data"),
+            InlineKeyboardButton("🗑️ Removed Text", callback_data="removed_text_data"),
+        ],
+        [
+            InlineKeyboardButton("💡 Help", callback_data="help_data"),
+            InlineKeyboardButton("ℹ️ About", callback_data="about_data"),
+        ],
+        [InlineKeyboardButton("❌ Close", callback_data="close_data")],
+    ]
+)
+
+# help buttons
+help_button = InlineKeyboardMarkup(
+    [
+        [InlineKeyboardButton("ABOUT MARKDOWN", callback_data="markdown_data")],
+        [
+            # InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+            InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+        ],
+    ]
+)
+
+# about buttons
+about_button = InlineKeyboardMarkup(
+    [
+        [InlineKeyboardButton("💡 Help", callback_data="help_data")],
+        [
+            # InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+            InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+        ],
+    ]
+)
+
+# source Buttons
+source_button = InlineKeyboardMarkup(
+    [
+        [
+            # InlineKeyboardButton("⏪ Back", callback_data="back_data"),
+            InlineKeyboardButton("❌ Close", callback_data="close_data"),
+        ]
+    ]
+)
+
+# removed text buttons
+removed_text_button = InlineKeyboardMarkup(
+    [
+        [InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+         InlineKeyboardButton("❌ CLOSE", callback_data="close_data")],
+    ]
+)
+
+@AutoCaptionBot.on_message(filters.command("start") & filters.private)
+async def start(bot, cmd):
+    global original_command
+    original_command = "start"
+
+    await bot.send_message(
+        chat_id=cmd.chat.id,
+        text=Translation.START_TEXT.format(
+            cmd.from_user.first_name, Config.ADMIN_USERNAME
+        ),
+        reply_to_message_id=cmd.id,
+        parse_mode=enums.ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
+        reply_markup=start_button,
     )
 
-    # 1. Build the raw JSON payload for Telegram's HTTP API with all 3 colored buttons
-    payload = {
-        "chat_id": message.chat.id,
-        "text": welcome_text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-        "reply_to_message_id": message.id,
-        "reply_markup": {
-            "inline_keyboard": [
+@AutoCaptionBot.on_message(filters.command("help") & filters.private)
+async def help(bot, cmd):
+    global original_command
+    original_command = "help"
+
+    await bot.send_message(
+        chat_id=cmd.chat.id,
+        text=Translation.HELP_TEXT,
+        reply_to_message_id=cmd.id,
+        parse_mode=enums.ParseMode.HTML,
+        disable_web_page_preview=True,
+        reply_markup=help_button,
+    )
+
+@AutoCaptionBot.on_message(filters.command("about") & filters.private)
+async def about(bot, cmd):
+    global original_command
+    original_command = "about"
+
+    await bot.send_message(
+        chat_id=cmd.chat.id,
+        text=Translation.ABOUT_TEXT,
+        reply_to_message_id=cmd.id,
+        parse_mode=enums.ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
+        reply_markup=about_button,
+    )
+
+@AutoCaptionBot.on_message(filters.command("source") & filters.private)
+async def source(bot, cmd):
+    await bot.send_message(
+        chat_id=cmd.chat.id,
+        text=Translation.SOURCE_TEXT,
+        reply_to_message_id=cmd.id,
+        parse_mode=enums.ParseMode.HTML,
+        disable_web_page_preview=True,
+        reply_markup=source_button,
+    )
+
+@AutoCaptionBot.on_callback_query()
+async def button(bot, cmd: CallbackQuery):
+    global original_command
+    cb_data = cmd.data
+    
+    if "about_data" in cb_data:
+        await cmd.message.edit(
+            text=Translation.ABOUT_TEXT,
+            parse_mode=enums.ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
                 [
-                    {
-                        "text": "📢 Update Channel",
-                        "url": "https://t.me/imaxprime", # Replace with your actual channel link
-                        "style": "primary", # Blue background
-                        "icon_custom_emoji_id": "5373303496357388091" # Replace or remove if not needed
-                    }
-                ],
-                [
-                    {
-                        "text": "ℹ️ About",
-                        "callback_data": "about_cb",
-                        "style": "success" # Green background
-                    },
-                    {
-                        "text": "❌ Close",
-                        "callback_data": "close_cb",
-                        "style": "danger" # Red background
-                    }
+                    [
+                        InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+                        InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                    ]
                 ]
-            ]
-        }
-    }
-
-    # 2. Send the message directly using aiohttp to support the new colors
-    bot_token = client.bot_token
-    api_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(api_url, json=payload) as response:
-                if response.status != 200:
-                    error_data = await response.text()
-                    logger.error(f"Failed to send styled start message: {error_data}")
-    except Exception as e:
-        logger.error(f"Error making HTTP request: {e}")
-
-@Client.on_callback_query(filters.regex("^(about_cb|close_cb)$"))
-async def handle_callbacks(client: Client, query: CallbackQuery):
-    """Handles clicks for the About and Close buttons."""
-    
-    if query.data == "close_cb":
-        # Delete the message when "Close" is clicked
-        await query.message.delete()
-        
-    elif query.data == "about_cb":
-        # Show an About message formatted with HTML
-        about_text = (
-            "🤖 <b>Auto Caption Cleaner Bot</b>\n\n"
-            "This bot automatically removes unwanted links, tags, and text from media "
-            "uploaded to your channels, keeping only the clean file name.\n\n"
-            "👨‍💻 <b>Developer:</b> <a href='https://t.me/ZeroCivicSense'>@ZeroCivicSense</a>"
+            ),
         )
-        
-        await query.answer("Fetching About Info...", show_alert=False)
-        
-        reply_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔙 Back", callback_data="back_to_start")]
-        ])
-        
-        # Use standard Pyrogram edit_text since we don't need colors here
-        await query.message.edit_text(
-            text=about_text,
+    elif "source_data" in cb_data:
+        await cmd.message.edit(
+            text=Translation.SOURCE_TEXT,
+            parse_mode=enums.ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        # InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+                        InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                    ]
+                ]
+            ),
+        )
+    elif "help_data" in cb_data:
+        if original_command in ["start", "about"]:
+            back_button = [
+                            InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+                            InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                        ]  
+        else:
+            back_button = [
+                            InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                        ]  
+
+        await cmd.message.edit(
+            text=Translation.HELP_TEXT,
             parse_mode=enums.ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=reply_markup
-        )
-
-@Client.on_callback_query(filters.regex("^back_to_start$"))
-async def back_to_start_callback(client: Client, query: CallbackQuery):
-    """Restores the original start message by editing the current message."""
-    await query.answer()
-    
-    # Get the user's name for the welcome text
-    user_name = query.from_user.first_name if query.from_user else "User"
-    
-    welcome_text = (
-        f"👋 Hi <b>{user_name}</b>,\n\n"
-        "<b>I am the Auto Caption Cleaner Bot!</b> 🤖\n\n"
-        "💡 <u><b>How to use:</b></u>\n"
-        "<i>Just add me as an Admin in your channel with Edit Messages permission, and I will handle the rest automatically!</i>"
-    )
-
-    # 1. Build the raw JSON payload for editing the message
-    payload = {
-        "chat_id": query.message.chat.id,
-        "message_id": query.message.id, # We specify the message_id to EDIT it
-        "text": welcome_text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-        "reply_markup": {
-            "inline_keyboard": [
+            reply_markup=InlineKeyboardMarkup(
                 [
-                    {
-                        "text": "📢 Update Channel",
-                        "url": "https://t.me/imaxprime", # Replace with your actual channel link
-                        "style": "primary", # Blue background
-                        "icon_custom_emoji_id": "5373303496357388091" # Replace or remove if not needed
-                    }
-                ],
-                [
-                    {
-                        "text": "ℹ️ About",
-                        "callback_data": "about_cb",
-                        "style": "success" # Green background
-                    },
-                    {
-                        "text": "❌ Close",
-                        "callback_data": "close_cb",
-                        "style": "danger" # Red background
-                    }
+                    [
+                        InlineKeyboardButton("ABOUT MARKDOWN", callback_data="markdown_data")
+                    ],
+                    back_button,
+                    
                 ]
-            ]
-        }
-    }
-
-    # 2. Call the editMessageText endpoint directly to restore the colors
-    bot_token = client.bot_token
-    api_url = f"https://api.telegram.org/bot{bot_token}/editMessageText"
-    
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(api_url, json=payload) as response:
-                if response.status != 200:
-                    error_data = await response.text()
-                    logger.error(f"Failed to edit styled start message: {error_data}")
-    except Exception as e:
-        logger.error(f"Error making HTTP request for edit: {e}")
+            ),
+        )
+    elif "back_data" in cb_data:
+        keyboard_markup = about_button if original_command == "about" else start_button
+        
+        await cmd.message.edit(
+            text=Translation.START_TEXT.format(
+                cmd.from_user.first_name, Config.ADMIN_USERNAME
+            ),
+            parse_mode=enums.ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
+            reply_markup=keyboard_markup,
+        )
+    elif "close_data" in cb_data:
+        await cmd.message.delete()
+        await cmd.message.reply_to_message.delete()
+    elif "markdown_data" in cb_data:
+        await cmd.message.edit(
+            text=Translation.MARKDOWN_TEXT,
+            parse_mode=enums.ParseMode.HTML,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("⏪ BACK", callback_data="help_data"),
+                        InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                    ]
+                ]
+            ),
+        )
+    elif "status_data" in cb_data:
+        await cmd.message.edit(
+            text=Translation.STATUS_DATA.format(
+                Config.CAPTION_TEXT, Config.CAPTION_POSITION
+            ),
+            parse_mode=enums.ParseMode.HTML,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("⏪ BACK", callback_data="back_data"),
+                        InlineKeyboardButton("❌ CLOSE", callback_data="close_data"),
+                    ]
+                ]
+            ),
+        )
+    elif "removed_text_data" in cb_data:
+        removed_text = "\n".join(Config.WORDS_TO_REMOVE) + "\n"+ "\n".join(Config.REGEX_PATTERNS)
+        await cmd.message.edit(
+            text=Translation.REMOVED_TEXT.format(removed_text),
+            parse_mode=enums.ParseMode.HTML,
+            disable_web_page_preview=True,
+            reply_markup=removed_text_button,
+        )
+ 
