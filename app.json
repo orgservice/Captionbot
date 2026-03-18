@@ -1,40 +1,54 @@
 {
-  "name": "Auto Caption Remover Bot",
-  "description": "Telegram auto caption remover bot.",
-  "keywords": ["telegram", "auto", "caption", "cleaner"],
-  "repository": "https://github.com/orgservice/Captionbot",
+  "name": "Caption Bot [ Avishkar Patil ]",
+  "description": "Telegram auto caption bot. Create your Fork now.",
+  "keywords": [
+    "telegram",
+    "best",
+    "auto",
+    "caption" 
+  ],
+  "success_url": "https://telegram.com/capxbot",
+  "website": "https://github.com/avipatilpro/Caption-Bot",
+  "repository": "https://github.com/avipatilpro/Caption-Bot",
+  "logo": "https://telegra.ph/file/a3e95bf96275cb37844b1.jpg",
   "env": {
-    "BOT_TOKEN": {
-      "description": "Your Telegram Bot Token from @BotFather.",
-      "value": "",
-      "required": true
+    "WEBHOOK": {
+      "description": "Setting this to ANYTHING will enable webhooks when in env mode",
+      "value": "ANYTHING"
     },
-    "API_ID": {
+    "TG_BOT_TOKEN": {
+      "description": "Your bot token, as a string.",
+      "value": "6583206123:AAEfBuiEsGItfGhPqwBBlQJpr9y_0KVbIoc"
+    },
+    "APP_ID": {
       "description": "Get this value from https://my.telegram.org",
-      "value": "",
-      "required": true
+      "value": "1371835"
     },
     "API_HASH": {
       "description": "Get this value from https://my.telegram.org",
-      "value": "",
-      "required": true
+      "value": "7217b7945bf6dab0ed8919e5dc697b0c"
+    },
+    "CAPTION_TEXT": {
+      "description": "Add your caption Defult will be [Markdown] [nothing]",
+      "value": "Working", 
+      "required": false 
+    },
+    "CAPTION_POSITION": {
+      "description": "Position of your caption [TOP, BOTTOM, NIL]",
+      "value": "BOTTOM"
     },
     "ADMIN_USERNAME": {
-      "description": "Admin username without [@].",
-      "value": "Admin", 
+      "description": "Admin username without [@], Default will be Ts_bots",
+      "value": "AvishkarPatil", 
       "required": false
-    },
-    "ALLOWED_CHANNELS": {
-      "description": "Comma separated channel IDs where the bot will work. Leave empty for all.",
-      "value": "",
-      "required": false
-    }
+    }        
+    
   },
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    }
+  "addons": [
   ],
+  "buildpacks": [{
+    "url": "heroku/python"
+  }],
   "formation": {
     "worker": {
       "quantity": 1,

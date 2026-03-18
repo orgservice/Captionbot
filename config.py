@@ -1,19 +1,37 @@
 import os
 
-class Config:
-    # Fetching secrets from environment variables
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", "8591161370:AAHVltcHDBLMtDq4DFsxg2mQEsdn4zMZJP0")
-    API_ID = int(os.environ.get("API_ID", "25465082"))
-    API_HASH = os.environ.get("API_HASH", "4a6b5e40c8bc08c8af09add6cca23b18")
+
+class Config(object):
+    # env vars
+    BOT_TOKEN = "7372474546:AAHY6OwSess3qxfP886CGKKWVVItZohX1KM"  # string
+    API_ID = 25465082 # int
+    API_HASH = "4a6b5e40c8bc08c8af09add6cca23b18"  # string
     
-    ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "HIT_Sir") # without @
+    # db vars
+    # keep empty if don't want to add any extra caption
+    CAPTION_TEXT = ""  
+    # BOTTOM or TOP or NIL
+    CAPTION_POSITION = "BOTTOM"  
+    ADMIN_USERNAME = "adultsupport"  # without "@". 
 
-    # Parses comma-separated channel IDs. Example: "-1001234567890, -1009876543210"
-    allowed_channels = os.environ.get("ALLOWED_CHANNELS", "")
-    ALLOWED_CHANNELS = [
-        int(ch.strip()) for ch in allowed_channels.split(",") if ch.strip()
-    ] if allowed_channels else []
+    # a list of strings of words to remove from the existing caption
+    WORDS_TO_REMOVE = ["✨Join:- @ViSHWA_MOViEX","🔸 Upload By [@The_Silent_Teams]", "⚡️Join:- [@ViSHWA_MOViEX]", "©@piro_files & 🤖@piroxbots", "@piro_files", "@piroxbots", "⚡ Join :- [@flimyworld_17]", "💥Join:- @ViSHWA_MOViEX", "🍿 𝖩𝗈𝗂𝗇  ➥ 「 @RJMoviessWorld 」"]  
+    # a list of regex pattern strings to remove from the existing caption. 
+    # For eg. r".*Join.*" will remove the entire line having word Join
+    REGEX_PATTERNS = []  
 
-    # Web Server configuration for Koyeb deployment
-    PORT = int(os.environ.get("PORT", "8080"))
-    WEB_RESPONSE = {"status": "Auto Caption Remover Bot is Running Successfully!"}
+    # keep empty to allow in all channels. Can add multiple channels separated by a comma.
+    # Don't forget -100 before the channel ID
+    ALLOWED_CHANNELS = []
+
+    # REMOVE or POSTFIX or NIL. Useful for tamilblasters, tamilmv and other webites
+    WEBSITE_PREFIX = "NIL"  
+
+    # True or False. Replaces YIFY website with YTS
+    YTS_WEBSITE_REPLACE = True 
+
+    # Dictionary of words to replace
+    REPLACE_DICTIONARY = {}
+
+    # Replace dot separator with space
+    SEPARATOR_SPACE = True
